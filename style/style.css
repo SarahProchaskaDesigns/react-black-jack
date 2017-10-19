@@ -1,0 +1,28 @@
+.whole-board{
+    /* display: flex; */
+    
+
+}
+.square{
+    background-color: #D7D1D1;
+    border: 1px solid #4E4C4C;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2em;
+}
+
+.pink{
+    color: #AE204B;
+}
+.blue{
+    color: blue;
+}
+.board-row{
+    display: flex;
+    /* position: absolute; */
+    width: 300px;
+    /* width: 30%; */
+}
