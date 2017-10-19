@@ -1,58 +1,100 @@
 // IMPORT DEPENDENCIES
-import React from 'react';
+import React, { Component } from 'react';
 
 // IMPORT COMPONENTS
-import Square from './square.js'
+import Hand from './hand';
 
-// CREATE COMPONENTS 
-const Board = (props) => {
-    var boardNumber = -1;
-    var row1 = [];
-    var row2 = [];
-    var row3 = [];
-        let gameSquares = props.boardStatus.map((square) => {
-                boardNumber += 1;
-                // console.log(square)
-                return (
-                    <Square 
-                        status = {square}
-                        key = {boardNumber}
-                        boardNumber = {boardNumber}
-                        makeMove = {props.makeMove}
-                        currentTurn = {props.currentTurn}
-                    />
-                )
-                
-        });
-        for(var i = 9 ; i > 0; i--){
-            if(gameSquares.length >= 7){
-                row3.push(gameSquares.pop())
-                continue;
+
+// CREATE COMPONENTS
+class Board extends Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            deck: null,
+            turn: "Player",
+            hands: {
+                player: [],
+                dealer: []
+            },
+            totalCount: {
+                player: 0,
+                dealer: 0
+            },
+            aces: {
+                player: 0,
+                dealer: 0
+            },
+            busted: false
+        }
+        // this.startingShuffle()
+        //    this.startingShuffle()
+    }
+    componentWillMount() {
+        console.log(" Component did mount ran - this worked!")
+        this.startingShuffle()
+    }
+
+
+    deckShuffle(deckToShuffle) {
+        var deck = deckToShuffle || [2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 7, 8, 8, 8, 8, 9, 9, 9, 9, 10, 10, 10, 10, "J", "J", "J", "J", "Q", "Q", "Q", "Q", "K", "K", "K", "K", "A", "A", "A", "A"];
+        deck = deck.slice();
+        // var deck = deckToShuffle.slice();
+        var shuffledDeck = [];
+        for (var i = 0; i < 52; i++) {
+            var randomNumber = Math.random() * 10;
+            if (randomNumber <= 2.4) {
+                shuffledDeck.push(deck.pop())
+                continue
             }
-            if(gameSquares.length >= 4){
-                row2.push(gameSquares.pop())
-                continue;
+            if (randomNumber <= 5) {
+                shuffledDeck.push(deck.shift())
+                continue
             }
-            if(gameSquares.length >= 1){
-                row1.push(gameSquares.pop())
+            if (randomNumber <= 7.4) {
+                shuffledDeck.unshift(deck.pop())
+                continue
+            } else {
+                shuffledDeck.unshift(deck.shift())
             }
         }
-        
-    return(
-        <div className="whole-board">
-            <div className="board-row">
-               {row1} 
-            </div> 
-            <div className="board-row">
-               {row2} 
-            </div> 
-            <div className="board-row">
-               {row3} 
-            </div> 
-        </div>
+        return shuffledDeck
+    }
+    startingShuffle() {
+        // var startingDeck = this.deckShuffle()
+        // console.log(startingDeck)
+        var startingDeck = this.deckShuffle(this.deckShuffle(this.deckShuffle(this.deckShuffle(this.deckShuffle(this.deckShuffle())))))
+        this.setState({
+            deck: startingDeck,
+        })
+    }
+    gameOver(number) {
+        if (number > 21) {
+            this.setState({
+                busted: true
+            })
+        }
+    }
 
-    )
-} 
+    render() {
+        console.log(this.state.deck)
+        console.log(this.state.turn)
+        return (
+            <div>
+                <Hand className="dealers-hand"
+                    shuffledDeck={this.state.deck}
+                    turn={this.state.turn}
+                    gameOver={(number) => { this.gameOver(number) }}
+                />
+                <Hand className="players-hand"
+                    shuffledDeck={this.state.deck}
+                    turn={this.state.turn}
+                    gameOver={(number) => { this.gameOver(number) }}
+                />
+            </div>
+        )
+    }
+}
 
-// EXPORT COMPONENT
-export default Board;
+
+// RENDER OR EXPORT COMPONENTS
+export default Board; 
