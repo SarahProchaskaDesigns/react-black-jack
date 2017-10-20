@@ -5,9 +5,10 @@ import React from 'react';
 
 
 // CREATE COMPONENTS
-const Card = () => {
+const Card = (props) => {
+    console.log(props.hand)
     return(
-        <div>I am a card</div>
+        <div className="card">{props.hand}</div>
     )
 }
 

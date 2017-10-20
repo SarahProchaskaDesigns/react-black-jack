@@ -10,18 +10,19 @@ class Board extends Component {
     constructor(props) {
         super(props)
         this.state = {
+            players: ['player', 'dealer'],
             deck: null,
-            turn: "Player",
+            turn: "Dealer",
             hands: {
                 player: [],
-                dealer: []
+                dealer: [""]
             },
             totalCount: {
-                player: 0,
-                dealer: 0
+                player: 11,
+                dealer: 10
             },
             aces: {
-                player: 0,
+                player: 1,
                 dealer: 0
             },
             busted: false
@@ -30,8 +31,12 @@ class Board extends Component {
         //    this.startingShuffle()
     }
     componentWillMount() {
-        console.log(" Component did mount ran - this worked!")
-        this.startingShuffle()
+        console.log(" Component WILL mount ran - this worked!")
+        this.startingShuffle();
+    }
+    componentDidMount(){
+        console.log(" Component DID mount ran - this worked!")
+        this.startingDeal()
     }
 
 
@@ -67,6 +72,25 @@ class Board extends Component {
             deck: startingDeck,
         })
     }
+
+    startingDeal(){
+        var playersCards = this.state.hands.player.slice();
+        var dealersCards = this.state.hands.dealer.slice();
+        var deck = this.state.deck.slice();
+        playersCards.push(deck.pop())
+        playersCards.push(deck.pop())
+        dealersCards.push(deck.pop())
+        this.setState({
+            deck: deck,
+            hands: {
+                player: playersCards,
+                dealer: dealersCards
+            }
+        })
+        console.log(playersCards)
+        console.log(dealersCards)
+        console.log(deck)
+    }
     gameOver(number) {
         if (number > 21) {
             this.setState({
@@ -76,20 +100,51 @@ class Board extends Component {
     }
 
     render() {
-        console.log(this.state.deck)
-        console.log(this.state.turn)
+        // console.log(this.state.deck)
+        // console.log(this.state.turn)
         return (
             <div>
-                <Hand className="dealers-hand"
+                {/* <Hand className="dealers-hand"
                     shuffledDeck={this.state.deck}
                     turn={this.state.turn}
+                    dealerCards = {this.state.hands.dealer}
+                    dealerCount = {this.state.totalCount.dealer}
+                    dealerAces = {this.state.aces.dealer}
+                    busted = {this.state.busted}
+                    //PASSED FUNCTIONS 
+                    gameOver={(number) => { this.gameOver(number) }}
+                /> */}
+                <div className="single-hand">
+                <h2>Dealer</h2>
+                <Hand className="dealer-hand"
+                    whosHand = {this.state.players[1]}
+                    shuffledDeck={this.state.deck}
+                    turn={this.state.turn}
+                    cards = {this.state.hands}
+                    count = {this.state.totalCount}
+                    aces = {this.state.aces.player}
+                    busted = {this.state.busted}
+                    //PASSED FUNCTIONS 
                     gameOver={(number) => { this.gameOver(number) }}
                 />
+                </div>
+                <div className="single-hand">
+                
                 <Hand className="players-hand"
+                    whosHand = {this.state.players[0]}
                     shuffledDeck={this.state.deck}
                     turn={this.state.turn}
+                    cards = {this.state.hands}
+                    count = {this.state.totalCount}
+                    aces = {this.state.aces.player}
+                    busted = {this.state.busted}
+                    //PASSED FUNCTIONS 
                     gameOver={(number) => { this.gameOver(number) }}
                 />
+                <button>Hit</button>
+                <button>Stay</button>
+                <h2>Player</h2>
+                </div>
             </div>
         )
     }

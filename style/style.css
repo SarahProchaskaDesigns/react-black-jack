@@ -1,28 +1,13 @@
-.whole-board{
-    /* display: flex; */
-    
-
+/* THIS IS THE ENTIRE HAND */
+.single-hand{
+    margin: 15px 0;
 }
-.square{
-    background-color: #D7D1D1;
-    border: 1px solid #4E4C4C;
-    width: 100px;
-    height: 100px;
+.single-hand h2{
+    font-size: 1.4em;
+}
+.hand{
     display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 2em;
 }
-
-.pink{
-    color: #AE204B;
-}
-.blue{
-    color: blue;
-}
-.board-row{
-    display: flex;
-    /* position: absolute; */
-    width: 300px;
-    /* width: 30%; */
+.card{
+    padding: 10px 30px;
 }
