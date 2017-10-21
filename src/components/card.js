@@ -6,7 +6,7 @@ import React from 'react';
 
 // CREATE COMPONENTS
 const Card = (props) => {
-    console.log(props.hand)
+    // console.log(props.hand)
     return(
         <div className="card">{props.hand}</div>
     )

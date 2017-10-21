@@ -1,5 +1,6 @@
 // IMPORT DEPENDENCIES
 import React, { Component } from 'react';
+import _ from 'underscore'
 
 // IMPORT COMPONENTS
 import Hand from './hand';
@@ -11,8 +12,9 @@ class Board extends Component {
         super(props)
         this.state = {
             players: ['player', 'dealer'],
+            stateOfGame: 'Player turn - Hit or Stay',
             deck: null,
-            turn: "Dealer",
+            turn: true,
             hands: {
                 player: [],
                 dealer: [""]
@@ -30,15 +32,33 @@ class Board extends Component {
         // this.startingShuffle()
         //    this.startingShuffle()
     }
+
     componentWillMount() {
         console.log(" Component WILL mount ran - this worked!")
         this.startingShuffle();
+        // if(this.state.turn === 'false' && this.state.hands.dealer.length < 5){
+        //     this.deal('dealer')
+            
+        // }
     }
+
     componentDidMount(){
         console.log(" Component DID mount ran - this worked!")
         this.startingDeal()
-    }
+        // this.deal('player');
+        // this.deal('dealer');
 
+    }
+    componentDidUpdate(){
+        console.log(" Component  WILL UPDATE ran - this worked!")
+        console.log(this.state.hands.dealer.length)
+        console.log(this.state.turn)
+        if(this.state.turn === false && this.state.hands.dealer.length < 5){
+            this.deal('dealer')
+            console.log('I am running')
+        }
+        console.log(this.state.hands.dealer)
+    }
 
     deckShuffle(deckToShuffle) {
         var deck = deckToShuffle || [2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 7, 8, 8, 8, 8, 9, 9, 9, 9, 10, 10, 10, 10, "J", "J", "J", "J", "Q", "Q", "Q", "Q", "K", "K", "K", "K", "A", "A", "A", "A"];
@@ -64,6 +84,7 @@ class Board extends Component {
         }
         return shuffledDeck
     }
+
     startingShuffle() {
         // var startingDeck = this.deckShuffle()
         // console.log(startingDeck)
@@ -77,8 +98,8 @@ class Board extends Component {
         var playersCards = this.state.hands.player.slice();
         var dealersCards = this.state.hands.dealer.slice();
         var deck = this.state.deck.slice();
-        playersCards.push(deck.pop())
-        playersCards.push(deck.pop())
+        playersCards.push(deck.pop());
+        playersCards.push(deck.pop());
         dealersCards.push(deck.pop())
         this.setState({
             deck: deck,
@@ -87,10 +108,37 @@ class Board extends Component {
                 dealer: dealersCards
             }
         })
-        console.log(playersCards)
-        console.log(dealersCards)
-        console.log(deck)
     }
+  
+    deal(currentPlayer){
+        var deck = this.state.deck.slice();
+        var currentHands = _.extend({}, this.state.hands);
+        var currentHand = currentHands[currentPlayer].slice()
+        currentHand.push(deck.pop());
+        currentHands[currentPlayer] = currentHand
+        this.setState({
+            deck: deck,
+            hands: currentHands
+        })
+    }
+
+    dealerDeal(){
+        this.deal('dealer')
+    }
+    playerDeal(){
+        if(this.state.turn){
+            this.deal('player')
+        }
+    }
+
+    stayButton(){
+        // this.deal()
+        // this.dealerDeal();
+        this.setState({
+            turn: false,
+        })
+    }
+
     gameOver(number) {
         if (number > 21) {
             this.setState({
@@ -128,6 +176,9 @@ class Board extends Component {
                     gameOver={(number) => { this.gameOver(number) }}
                 />
                 </div>
+                <h3>{this.state.stateOfGame}</h3>
+                <h5> Dealer Total: {this.state.totalCount.dealer}</h5>
+                <h5> Dealer Total: {this.state.totalCount.player}</h5>
                 <div className="single-hand">
                 
                 <Hand className="players-hand"
@@ -141,8 +192,8 @@ class Board extends Component {
                     //PASSED FUNCTIONS 
                     gameOver={(number) => { this.gameOver(number) }}
                 />
-                <button>Hit</button>
-                <button>Stay</button>
+                <button onClick={()=>{this.playerDeal()}}>Hit</button>
+                <button onClick={()=>{this.stayButton()}}>Stay</button>
                 <h2>Player</h2>
                 </div>
             </div>

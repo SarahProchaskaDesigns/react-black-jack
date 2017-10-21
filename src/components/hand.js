@@ -28,8 +28,8 @@ import Card from './card'
 const Hand = (props) => {
     var name = props.whosHand;
     var i = 0;
-    console.log("I am the " + props.whosHand)
-    console.log("I am the " + name)
+    // console.log("I am the " + props.whosHand)
+    // console.log("I am the " + name)
     console.log(props.cards)
     const allCards = props.cards[name].map((cardValue) => {
             // console.log(arrayCards)
