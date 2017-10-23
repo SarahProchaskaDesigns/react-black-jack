@@ -20,34 +20,25 @@ class Board extends Component {
                 dealer: [""]
             },
             totalCount: {
-                player: 11,
-                dealer: 10
+                player: 0,
+                dealer: 0
             },
             aces: {
-                player: 1,
+                player: 0,
                 dealer: 0
             },
             busted: false
         }
-        // this.startingShuffle()
-        //    this.startingShuffle()
     }
 
     componentWillMount() {
         console.log(" Component WILL mount ran - this worked!")
         this.startingShuffle();
-        // if(this.state.turn === 'false' && this.state.hands.dealer.length < 5){
-        //     this.deal('dealer')
-            
-        // }
     }
 
     componentDidMount(){
         console.log(" Component DID mount ran - this worked!")
         this.startingDeal()
-        // this.deal('player');
-        // this.deal('dealer');
-
     }
     componentDidUpdate(){
         console.log(" Component  WILL UPDATE ran - this worked!")
@@ -101,6 +92,8 @@ class Board extends Component {
         playersCards.push(deck.pop());
         playersCards.push(deck.pop());
         dealersCards.push(deck.pop())
+        // this.getCount('player');
+        // this.getCount('dealer')
         this.setState({
             deck: deck,
             hands: {
@@ -111,20 +104,36 @@ class Board extends Component {
     }
   
     deal(currentPlayer){
+        // this.getCount(currentPlayer)
         var deck = this.state.deck.slice();
+       
         var currentHands = _.extend({}, this.state.hands);
-        var currentHand = currentHands[currentPlayer].slice()
-        currentHand.push(deck.pop());
-        currentHands[currentPlayer] = currentHand
-        this.setState({
-            deck: deck,
-            hands: currentHands
-        })
+        var currentHand = currentHands[currentPlayer].slice();
+        var totalAces = _.extend({}, this.state.aces);
+        var currentAces = totalAces[currentPlayer];
+        var currentCard = deck.pop();
+        if(currentCard === "A"){
+            currentAces += 1
+            totalAces[currentPlayer] = currentAces;
+            this.setState({
+                deck: deck,
+                aces: totalAces
+            })
+        }
+            currentHand.push(currentCard);
+            currentHands[currentPlayer] = currentHand
+            this.setState({
+                deck: deck,
+                hands: currentHands
+            })
+            console.log(this.state.aces)
+        
     }
 
     dealerDeal(){
         this.deal('dealer')
     }
+
     playerDeal(){
         if(this.state.turn){
             this.deal('player')
@@ -138,7 +147,32 @@ class Board extends Component {
             turn: false,
         })
     }
+    getCount(currentPlayer){
+        var totalCount = _.extend({}, this.state.totalCount);
+        var currentPlayerHand = this.state.hands[currentPlayer].map((digit) => {
+            if(digit === 'J' || digit === 'Q' || digit === 'K'){
+                return 10
+            }
+            if(digit === NaN){
+                return 0
+            }
+            else return digit
+        })
+        var currentNumberAces = this.state.aces[currentPlayer]
+        var currentTotal = currentPlayerHand.reduce((a, b) => {return a + b})
+        while(currentNumberAces > 0){
+            if(currentTotal <= 10 && this.state.aces[currentPlayer] === 1){
+                currentTotal += 11
+            }
+            currentTotal += 1;
+            currentNumberAces -= 1;
+        }
+        totalCount[currentPlayer] = currentTotal
+        this.setState({
+            totalCount: totalCount
+        })
 
+    }
     gameOver(number) {
         if (number > 21) {
             this.setState({
@@ -178,7 +212,7 @@ class Board extends Component {
                 </div>
                 <h3>{this.state.stateOfGame}</h3>
                 <h5> Dealer Total: {this.state.totalCount.dealer}</h5>
-                <h5> Dealer Total: {this.state.totalCount.player}</h5>
+                <h5> Player Total: {this.state.totalCount.player}</h5>
                 <div className="single-hand">
                 
                 <Hand className="players-hand"
