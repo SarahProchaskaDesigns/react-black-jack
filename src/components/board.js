@@ -17,16 +17,16 @@ class Board extends Component {
             turn: true,
             hands: {
                 player: [],
-                dealer: [""]
+                dealer: []
             },
             totalCount: {
                 player: 0,
                 dealer: 0
             },
-            aces: {
-                player: 0,
-                dealer: 0
-            },
+            // aces: {
+            //     player: 0,
+            //     dealer: 0
+            // },
             busted: false
         }
     }
@@ -39,16 +39,21 @@ class Board extends Component {
     componentDidMount(){
         console.log(" Component DID mount ran - this worked!")
         this.startingDeal()
+        // this.deal('player')
+        // this.deal('dealer');
+        // this.deal('player')
     }
     componentDidUpdate(){
-        console.log(" Component  WILL UPDATE ran - this worked!")
-        console.log(this.state.hands.dealer.length)
+        console.log(" Component  DID UPDATE ran - this worked!")
         console.log(this.state.turn)
-        if(this.state.turn === false && this.state.hands.dealer.length < 5){
-            this.deal('dealer')
-            console.log('I am running')
-        }
-        console.log(this.state.hands.dealer)
+        // console.log(this.state.hands.dealer.length)
+        
+        // if(this.state.turn === false && this.state.hands.dealer.length < 5){
+        //     this.deal('dealer')
+        //     console.log('I am running')
+        // }
+        // console.log(this.state.hands.dealer)
+        // console.log(this.state.deck.length)
     }
 
     deckShuffle(deckToShuffle) {
@@ -86,93 +91,159 @@ class Board extends Component {
     }
 
     startingDeal(){
-        var playersCards = this.state.hands.player.slice();
-        var dealersCards = this.state.hands.dealer.slice();
-        var deck = this.state.deck.slice();
-        playersCards.push(deck.pop());
-        playersCards.push(deck.pop());
-        dealersCards.push(deck.pop())
-        // this.getCount('player');
-        // this.getCount('dealer')
+        var startingDeck = this.state.deck.slice();
+        var playerHand = this.state.hands.player.slice();
+        var dealerHand = this.state.hands.dealer.slice();
+        // var totalCountDealer = this.state.totalCount.dealer;
+        // var totalCountPlayer= this.state.totalCount.player;
+        this.deal(startingDeck, playerHand);
+        this.deal(startingDeck, playerHand);
+        var totalCountPlayer = this.getCount(playerHand)
+        this.deal(startingDeck, dealerHand)
+        var totalCountDealer = this.getCount(dealerHand)
+        console.log(totalCountDealer)
+        console.log(totalCountPlayer)
         this.setState({
-            deck: deck,
+            deck: startingDeck,
             hands: {
-                player: playersCards,
-                dealer: dealersCards
-            }
+                player: playerHand,
+                dealer: dealerHand
+            },
+            totalCount: {
+                player: totalCountPlayer,
+                dealer: totalCountDealer
+            },
         })
     }
-  
-    deal(currentPlayer){
-        // this.getCount(currentPlayer)
-        var deck = this.state.deck.slice();
-       
-        var currentHands = _.extend({}, this.state.hands);
-        var currentHand = currentHands[currentPlayer].slice();
-        var totalAces = _.extend({}, this.state.aces);
-        var currentAces = totalAces[currentPlayer];
+
+    // dealCard(currentPlayer, currentCard){
+    //     var currentPlayerCards = this.state.hands[currentPlayer]
+    //     return currentPlayerCards.push(currentCard)
+    // }
+    deal(deck, playersHand){
+        console.log(deck.pop())
         var currentCard = deck.pop();
-        if(currentCard === "A"){
-            currentAces += 1
-            totalAces[currentPlayer] = currentAces;
-            this.setState({
-                deck: deck,
-                aces: totalAces
-            })
-        }
-            currentHand.push(currentCard);
-            currentHands[currentPlayer] = currentHand
-            this.setState({
-                deck: deck,
-                hands: currentHands
-            })
-            console.log(this.state.aces)
+        playersHand.push(currentCard)
+        console.log(playersHand)
+    }
+
+        // this.getCount(currentPlayer)
+    //     var deck = this.state.deck.slice();
+    //     var currentHands = _.extend({}, this.state.hands);
+    //     var currentHand = currentHands[currentPlayer].slice();
+
+    //     var totalAces = _.extend({}, this.state.aces);
+    //     var currentAces = totalAces[currentPlayer];
+    //     var currentCard = deck.pop();
+
+    //     if(currentCard === "A"){
+    //         currentAces += 1
+    //         totalAces[currentPlayer] = currentAces;
+    //         // this.setState({
+    //         //     deck: deck,
+    //         //     aces: totalAces
+    //         // })
+    //     }
+    //         currentHand.push(currentCard);
+    //         currentHands[currentPlayer] = currentHand
+    //         this.setState({
+    //             deck: deck,
+    //             hands: currentHands
+    //         })
+    //         console.log(this.state)
         
-    }
+    // }
 
-    dealerDeal(){
-        this.deal('dealer')
-    }
+    // dealerDeal(){
+    //     this.deal('dealer')
+    // }
 
-    playerDeal(){
-        if(this.state.turn){
-            this.deal('player')
+    playerDeal(person){
+        var startingDeck = this.state.deck.slice();
+        var dealerHand = this.state.hands.dealer.slice();
+        var playerHand = this.state.hands.player.slice();
+        var totalCountDealer = this.state.totalCount.dealer
+        var totalCountPlayer = this.state.totalCount.player
+        if(person === 'player' && this.state.turn){
+            this.deal(startingDeck, playerHand);
+            totalCountPlayer = this.getCount(playerHand)
         }
+        if(person === 'dealer'){
+            while(totalCountDealer <= 16){
+                this.deal(startingDeck, dealerHand);
+                totalCountDealer = this.getCount(dealerHand) 
+            }
+        }
+
+        this.setState({
+            deck: startingDeck,
+            hands: {
+                player: playerHand,
+                dealer: dealerHand
+            },
+            totalCount: {
+                player: totalCountPlayer,
+                dealer: totalCountDealer
+            },
+        })
     }
 
     stayButton(){
-        // this.deal()
-        // this.dealerDeal();
         this.setState({
             turn: false,
-        })
+        }, this.playerDeal('dealer'))
     }
-    getCount(currentPlayer){
-        var totalCount = _.extend({}, this.state.totalCount);
-        var currentPlayerHand = this.state.hands[currentPlayer].map((digit) => {
+    getCount(playersHand){
+        var playersTotal = 0;
+        var numberAces = 0;
+       var numberHand = playersHand.map((digit) => {
             if(digit === 'J' || digit === 'Q' || digit === 'K'){
                 return 10
             }
-            if(digit === NaN){
+            if(digit === 'A'){
+                numberAces += 1
                 return 0
             }
             else return digit
         })
-        var currentNumberAces = this.state.aces[currentPlayer]
-        var currentTotal = currentPlayerHand.reduce((a, b) => {return a + b})
-        while(currentNumberAces > 0){
-            if(currentTotal <= 10 && this.state.aces[currentPlayer] === 1){
+        var currentTotal = numberHand.reduce((a, b) => {return a + b})
+        while(numberAces > 0){
+            if(currentTotal <= 10 && numberAces === 1){
                 currentTotal += 11
+            }else{
+                currentTotal += 1;
             }
-            currentTotal += 1;
-            currentNumberAces -= 1;
+            numberAces-= 1;
         }
-        totalCount[currentPlayer] = currentTotal
-        this.setState({
-            totalCount: totalCount
-        })
-
+       return playersTotal = currentTotal
     }
+
+    // getCount(currentPlayer){
+    //     var totalCount = _.extend({}, this.state.totalCount);
+    //     var currentPlayerHand = this.state.hands[currentPlayer].map((digit) => {
+    //         if(digit === 'J' || digit === 'Q' || digit === 'K'){
+    //             return 10
+    //         }
+    //         if(digit === NaN){
+    //             return 0
+    //         }
+    //         else return digit
+    //     })
+    //     var currentNumberAces = this.state.aces[currentPlayer]
+    //     var currentTotal = currentPlayerHand.reduce((a, b) => {return a + b})
+    //     while(currentNumberAces > 0){
+    //         if(currentTotal <= 10 && this.state.aces[currentPlayer] === 1){
+    //             currentTotal += 11
+    //         }
+    //         currentTotal += 1;
+    //         currentNumberAces -= 1;
+    //     }
+    //     totalCount[currentPlayer] = currentTotal
+    //     this.setState({
+    //         totalCount: totalCount
+    //     })
+
+    // }
     gameOver(number) {
         if (number > 21) {
             this.setState({
@@ -204,7 +275,7 @@ class Board extends Component {
                     turn={this.state.turn}
                     cards = {this.state.hands}
                     count = {this.state.totalCount}
-                    aces = {this.state.aces.player}
+                    
                     busted = {this.state.busted}
                     //PASSED FUNCTIONS 
                     gameOver={(number) => { this.gameOver(number) }}
@@ -221,12 +292,12 @@ class Board extends Component {
                     turn={this.state.turn}
                     cards = {this.state.hands}
                     count = {this.state.totalCount}
-                    aces = {this.state.aces.player}
+                   
                     busted = {this.state.busted}
                     //PASSED FUNCTIONS 
                     gameOver={(number) => { this.gameOver(number) }}
                 />
-                <button onClick={()=>{this.playerDeal()}}>Hit</button>
+                <button onClick={()=>{this.playerDeal('player')}}>Hit</button>
                 <button onClick={()=>{this.stayButton()}}>Stay</button>
                 <h2>Player</h2>
                 </div>
